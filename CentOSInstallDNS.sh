@@ -3,7 +3,7 @@
 # CentOSInstallDNS.sh
 # Author: Arthur "Damon" Mills
 # Last Update: 06.03.2018
-# Version: .1
+# Version: .2
 # License: GPLv3
 
 # Usage: Installs, configures, and deploys DNS Server (dnsmasq) on CentOS7 
@@ -35,10 +35,10 @@ function confdns()
     
     # creates a backup of /etc/dnsmasq.conf to /etc/dnsmasq.conf.orig
     sudo cp /etc/dnsmasq.conf /etc/dnsmasq.conf.orig
-    echo "Original /etc/dnsmasq.conf backed up to /etc/dnsmasq.conf.orig" >> $LOG
+    echo "Original /etc/dnsmasq.conf backed up to /etc/dnsmasq.conf.orig" | tee -a $LOG
     
     # write configuration to /etc/dnsmasq.conf file
-    echo -n "Writing configuration to /etc/dnsmasq.conf..." >> $LOG
+    echo -n "Writing configuration to /etc/dnsmasq.conf..." | tee -a $LOG
     sudo sed -i -e "s/#domain-needed/domain-needed/g" /etc/dnsmasq.conf
     sudo sed -i -e "s/#bogus-priv/bogus-priv/g" /etc/dnsmasq.conf
     sudo sed -i -e "s/#strict-order/strict-order/g" /etc/dnsmasq.conf
@@ -49,7 +49,7 @@ function confdns()
     sudo sed -i -e "/#addn-hosts=/a addn-hosts=\/etc\/dnsmasq_static_hosts.conf" /etc/dnsmasq.conf
     # touch /etc/dnsmasq_statis_hosts.conf to create, in case one does not exist
     sudo touch /etc/dnsmasq_static_hosts.conf
-    echo "SUCCESS" >> $LOG
+    echo "SUCCESS" | tee -a $LOG
     
     return 0 # return confdns
 }
@@ -59,16 +59,16 @@ function svcsdns()
     local LOG=$1    # log file
 
     # starts dnsmasq service and enables on boot
-    echo -n "Enabling DNS (dnsmasq) service on boot..." >> $LOG
+    echo -n "Enabling DNS (dnsmasq) service on boot..." | tee -a $LOG
     sudo systemctl start dnsmasq | tee -a $LOG
     sudo systemctl enable dnsmasq | tee -a $LOG
-    echo "SUCCESS" >> $LOG
+    echo "SUCCESS" | tee -a $LOG
     
     # adds DNS service entry to CentOS firewall
-    echo -n "Creating DNS (dnsmasq) firewall entry..." >> $LOG
+    echo -n "Creating DNS (dnsmasq) firewall entry..." | tee -a $LOG
     sudo firewall-cmd --add-service=dns --permanent
     sudo firewall-cmd --reload
-    echo "SUCCESS" >> $LOG
+    echo "SUCCESS" | tee -a $LOG
 
     return 0 # return svcsdns
 }
@@ -82,13 +82,13 @@ INSTALL_LOG="install.$(date +%H%M%S)_$(date +%m%d%Y).log"
 
 PROMPT="N"
 # prompts user to continue prior to beginning install
-echo "CentOS7 DNS (dnsmasq) server install/configuration." >> $INSTALL_LOG
+echo "CentOS7 DNS (dnsmasq) server install/configuration." | tee -a $INSTALL_LOG
 read -p "Continue (y/n)? " PROMPT
 if [ ${PROMPT^^} = "Y" ] || [ ${PROMPT^^} = "YES" ]; then
-    echo "Beginning installation..." >> $INSTALL_LOG
+    echo "Beginning installation..." | tee -a $INSTALL_LOG
     sudo su
 else
-    echo "Installation cancelled by user." >> $INSTALL_LOG
+    echo "Installation cancelled by user." | tee -a $INSTALL_LOG
     exit 1
 fi
 
@@ -124,20 +124,20 @@ until [ ${PROMPT^^} = "Y" ] || [ ${PROMPT^^} = "YES" ]; do
 done
 
 # records user choices in log file 
-echo -e "Primary DNS:\t ${PRIMARY}" &>> $INSTALL_LOG
-echo -e "Secondary DNS:\t ${SECONDARY}" &>> $INSTALL_LOG
-echo -e "Domain:\t\t ${DOMAIN}" &>> $INSTALL_LOG
+echo -e "Primary DNS:\t ${PRIMARY}" >> $INSTALL_LOG
+echo -e "Secondary DNS:\t ${SECONDARY}" >> $INSTALL_LOG
+echo -e "Domain:\t\t ${DOMAIN}" >> $INSTALL_LOG
 
 # updates all yum packages and downloads dnsmasq package
-echo "Updating all packages and downloading DNS server (dnsmasq)." >> $INSTALL_LOG
-sudo yum -y update
-sudo yum -y install dnsmasq | tee -a $INSTALL_LOG
+echo "Updating all packages and downloading DNS server (dnsmasq)." | tee -a $INSTALL_LOG
+sudo yum -y update >> $INSTALL_LOG
+sudo yum -y install dnsmasq >> $INSTALL_LOG
 
 confdns $MY_IP $PRIMARY $SECONDARY $DOMAIN $INSTALL_LOG
 svcsdns $INSTALL_LOG
 
 # finalize installation
-echo "DNS (dnsmasq) server installation successful." >> $INSTALL_LOG
-echo "Add DNS records in /etc/hosts file to complete configuration." >> $INSTALL_LOG
+echo "DNS (dnsmasq) server installation successful." | tee -a $INSTALL_LOG
+echo "Add DNS records in /etc/hosts file to complete configuration." | tee -a $INSTALL_LOG
 
 exit 0 # end CentOSInstallDNS.sh
