@@ -49,7 +49,7 @@ function confdns()
     sudo sed -i -e "/#addn-hosts=/a addn-hosts=\/etc\/dnsmasq_static_hosts.conf" /etc/dnsmasq.conf
     # touch /etc/dnsmasq_statis_hosts.conf to create, in case one does not exist
     sudo touch /etc/dnsmasq_static_hosts.conf
-    echo "SUCCESS" | tee -a $LOG
+    echo "success" | tee -a $LOG
     
     return 0 # return confdns
 }
@@ -59,16 +59,15 @@ function svcsdns()
     local LOG=$1    # log file
 
     # starts dnsmasq service and enables on boot
-    echo -n "Enabling DNS (dnsmasq) service on boot..." | tee -a $LOG
+    echo "Enabling DNS (dnsmasq) service on boot..." | tee -a $LOG
     sudo systemctl start dnsmasq | tee -a $LOG
     sudo systemctl enable dnsmasq | tee -a $LOG
-    echo "SUCCESS" | tee -a $LOG
     
     # adds DNS service entry to CentOS firewall
     echo -n "Creating DNS (dnsmasq) firewall entry..." | tee -a $LOG
     sudo firewall-cmd --add-service=dns --permanent
+    echo -n "Reloading CentOS firewall daemon..." | tee -a $LOG
     sudo firewall-cmd --reload
-    echo "SUCCESS" | tee -a $LOG
 
     return 0 # return svcsdns
 }
@@ -137,6 +136,6 @@ svcsdns $INSTALL_LOG
 
 # finalize installation
 echo "DNS (dnsmasq) server installation successful." | tee -a $INSTALL_LOG
-echo "Add DNS records in /etc/hosts file to complete configuration." | tee -a $INSTALL_LOG
+echo "Add DNS records in /etc/hosts to complete additional configuration." | tee -a $INSTALL_LOG
 
 exit 0 # end CentOSInstallDNS.sh
