@@ -86,7 +86,7 @@ read -p "Continue (y/n)? " PROMPT
 if [ ${PROMPT^^} = "Y" ] || [ ${PROMPT^^} = "YES" ]; then
     echo "Beginning installation..." | tee -a $INSTALL_LOG
 else
-    echo "Installation cancelled by user." | tee -a $INSTALL_LOG
+    echo "Installation cancelled by user" | tee -a $INSTALL_LOG
     exit 1
 fi
 
@@ -127,7 +127,7 @@ echo -e "Secondary DNS:\t ${SECONDARY}" >> $INSTALL_LOG
 echo -e "Domain:\t\t ${DOMAIN}" >> $INSTALL_LOG
 
 # updates all yum packages and downloads dnsmasq package
-echo "Updating all packages and downloading DNS server (dnsmasq)." | tee -a $INSTALL_LOG
+echo "Updating all packages and downloading DNS server (dnsmasq)" | tee -a $INSTALL_LOG
 sudo yum -y update >> $INSTALL_LOG
 sudo yum -y install dnsmasq >> $INSTALL_LOG
 
@@ -135,7 +135,7 @@ confdns $MY_IP $PRIMARY $SECONDARY $DOMAIN $INSTALL_LOG
 svcsdns $INSTALL_LOG
 
 # finalize installation
-echo "DNS (dnsmasq) server installation successful." | tee -a $INSTALL_LOG
-echo "Add DNS records in /etc/hosts to complete additional configuration." | tee -a $INSTALL_LOG
+echo "DNS (dnsmasq) server installation... success" | tee -a $INSTALL_LOG
+echo "Add any required DNS records in /etc/hosts to complete configuration" | tee -a $INSTALL_LOG
 
 exit 0 # end CentOSInstallDNS.sh
