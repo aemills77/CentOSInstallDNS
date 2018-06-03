@@ -86,7 +86,6 @@ echo "CentOS7 DNS (dnsmasq) server install/configuration." | tee -a $INSTALL_LOG
 read -p "Continue (y/n)? " PROMPT
 if [ ${PROMPT^^} = "Y" ] || [ ${PROMPT^^} = "YES" ]; then
     echo "Beginning installation..." | tee -a $INSTALL_LOG
-    sudo su
 else
     echo "Installation cancelled by user." | tee -a $INSTALL_LOG
     exit 1
